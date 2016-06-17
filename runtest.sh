@@ -63,6 +63,10 @@ user_exists_or_create() {
 
 prepare_chroot_jail() {
     user=$1
+
+    rootdir=$ROOTDIR/$user
+    [ -d $rootdir ] &&  rm -rf $rootdir
+
     mock_conf=$CONFDIR/`basename $config`
     sudo -u $user $MOCK -r $mock_conf --init
 }
@@ -141,6 +145,8 @@ clean_test_stales() {
     $MOCK -r $mock_conf --chroot "rm -rf /opt/nubosh" >> mock.log 2>&1
 
     umount $ROOTDIR/$user/root/local
+
+    [ -d $ROOTDIR/$user/root/var/cache/yum ] && umount $ROOTDIR/$user/root/var/cache/yum
 
     [ -f $CONFDIR/`basename $config` ] && rm -f $CONFDIR/`basename $config`
 
